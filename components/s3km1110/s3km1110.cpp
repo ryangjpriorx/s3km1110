@@ -22,8 +22,12 @@ void S3KM1110Component::loop() {
     while (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
       line.pop_back();
 
+    // Normalize to uppercase for easier matching
+    std::string upper = line;
+    for (auto &c : upper) c = toupper(c);
+
     // Presence ON
-    if (line == "ON") {
+    if (upper == "ON") {
       occupied_ = true;
       if (presence_binary_sensor_ != nullptr)
         presence_binary_sensor_->publish_state(true);
@@ -31,18 +35,26 @@ void S3KM1110Component::loop() {
     }
 
     // Presence OFF
-    if (line == "OFF") {
+    if (upper == "OFF") {
       occupied_ = false;
       if (presence_binary_sensor_ != nullptr)
         presence_binary_sensor_->publish_state(false);
       continue;
     }
 
-    // RANGE:<value>
-    if (line.rfind("RANGE:", 0) == 0) {
-      std::string value_str = line.substr(6);
+    // RANGE:<value> or Range <value>
+    if (upper.rfind("RANGE", 0) == 0) {
+      // Remove "RANGE" or "Range"
+      std::string value_str = line.substr(5);
+
+      // Remove separators like ":" or " "
+      while (!value_str.empty() && (value_str[0] == ':' || value_str[0] == ' '))
+        value_str.erase(0, 1);
+
       float distance = atof(value_str.c_str());
       presence_raw_ = distance;
+
+      ESP_LOGI(TAG, "Distance parsed: %.2f", distance);
 
       if (presence_raw_sensor_ != nullptr)
         presence_raw_sensor_->publish_state(distance);
