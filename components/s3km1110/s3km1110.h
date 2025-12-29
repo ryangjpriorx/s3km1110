@@ -49,7 +49,7 @@ class S3KM1110Component : public Component {
       }
     }
 
-    delay(1);  // yield to WiFi/API
+    delay(1);
   }
 
  protected:
@@ -68,7 +68,6 @@ class S3KM1110Component : public Component {
 
     ESP_LOGD(TAG, "Received line: '%s'", trimmed.c_str());
 
-    // Presence ON/OFF
     if (equals_ignore_case_(trimmed, "ON")) {
       if (this->presence_sensor_)
         this->presence_sensor_->publish_state(1.0f);
@@ -85,7 +84,6 @@ class S3KM1110Component : public Component {
       return;
     }
 
-    // Range <value>
     const std::string prefix = "Range ";
     if (starts_with_(trimmed, prefix)) {
       float value = atof(trimmed.substr(prefix.size()).c_str());
@@ -95,7 +93,6 @@ class S3KM1110Component : public Component {
     }
   }
 
-  // Helpers
   static std::string trim_(const std::string &s) {
     size_t start = s.find_first_not_of(" \t");
     if (start == std::string::npos)
