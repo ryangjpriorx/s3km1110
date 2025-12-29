@@ -24,36 +24,38 @@ class S3KM1110Component : public Component {
     this->line_buffer_.reserve(64);
   }
 
-  void loop() override {
-    if (this->uart_ == nullptr)
-      return;
+void loop() override {
+  if (!this->uart_)
+    return;
 
-    while (this->uart_->available()) {
-      uint8_t byte;
-      this->uart_->read_byte(&byte);
+  // Limit how many bytes we process per loop iteration
+  int processed = 0;
+  const int max_bytes = 32;  // prevents blocking
 
-      // Log raw bytes for debugging (can be commented out later)
-      ESP_LOGVV(TAG, "UART byte: 0x%02X", byte);
+  while (this->uart_->available() && processed < max_bytes) {
+    uint8_t byte;
+    this->uart_->read_byte(&byte);
+    processed++;
 
-      char c = static_cast<char>(byte);
+    char c = static_cast<char>(byte);
 
-      // Line termination on CR or LF
-      if (c == '\r' || c == '\n') {
-        if (!this->line_buffer_.empty()) {
-          this->process_line_(this->line_buffer_);
-          this->line_buffer_.clear();
-        }
+    if (c == '\r' || c == '\n') {
+      if (!this->line_buffer_.empty()) {
+        this->process_line_(this->line_buffer_);
+        this->line_buffer_.clear();
+      }
+    } else {
+      if (this->line_buffer_.size() < 63) {
+        this->line_buffer_.push_back(c);
       } else {
-        if (this->line_buffer_.size() < 63) {
-          this->line_buffer_.push_back(c);
-        } else {
-          // avoid runaway buffer; reset if it gets too long
-          ESP_LOGW(TAG, "Line too long, resetting buffer");
-          this->line_buffer_.clear();
-        }
+        this->line_buffer_.clear();
       }
     }
   }
+
+  // Yield to allow WiFi/API tasks to run
+  delay(1);
+}
 
  protected:
   uart::UARTComponent *uart_{nullptr};
