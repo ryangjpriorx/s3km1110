@@ -11,7 +11,7 @@ S3KM1110Sensor = s3km1110_ns.class_("S3KM1110Sensor", sensor.Sensor, cg.Componen
 CONFIG_SCHEMA = sensor.sensor_schema(
     S3KM1110Sensor,
     unit_of_measurement=UNIT_EMPTY,
-    icon=ICON_RADAR,
+    icon=ICON_WAVEFORM,
 ).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
