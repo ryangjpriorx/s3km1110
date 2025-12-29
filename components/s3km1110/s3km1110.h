@@ -3,7 +3,6 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/binary_sensor/binary_sensor.h"
 
 namespace esphome {
 namespace s3km1110 {
@@ -15,14 +14,15 @@ class S3KM1110Component : public Component {
   void set_micro_motion_sensor(sensor::Sensor *s) { this->micro_motion_sensor_ = s; }
   void set_presence_confidence_sensor(sensor::Sensor *s) { this->presence_confidence_sensor_ = s; }
   void set_motion_energy_sensor(sensor::Sensor *s) { this->motion_energy_sensor_ = s; }
-  void set_presence_binary_sensor(binary_sensor::BinarySensor *bs) { this->presence_binary_sensor_ = bs; }
+  void set_presence_sensor(sensor::Sensor *s) { this->presence_sensor_ = s; }
 
   void setup() override {
     // Initialize hardware here if needed
   }
 
   void loop() override {
-    if (this->uart_ == nullptr) return;
+    if (this->uart_ == nullptr)
+      return;
 
     // TODO: Replace with real UART parsing for S3KM1110
     while (this->uart_->available()) {
@@ -35,7 +35,7 @@ class S3KM1110Component : public Component {
     float micro_motion = 1.0f;
     float presence_confidence = 80.0f;
     float motion_energy = 5.0f;
-    bool presence = true;
+    float presence = 1.0f;  // 1 = present, 0 = not present
 
     if (this->micro_motion_sensor_ != nullptr)
       this->micro_motion_sensor_->publish_state(micro_motion);
@@ -46,10 +46,8 @@ class S3KM1110Component : public Component {
     if (this->motion_energy_sensor_ != nullptr)
       this->motion_energy_sensor_->publish_state(motion_energy);
 
-    if (this->presence_binary_sensor_ != nullptr)
-      this->presence_binary_sensor_->publish_state(presence);
-
-    delay(500);
+    if (this->presence_sensor_ != nullptr)
+      this->presence_sensor_->publish_state(presence);
   }
 
  protected:
@@ -58,7 +56,7 @@ class S3KM1110Component : public Component {
   sensor::Sensor *micro_motion_sensor_{nullptr};
   sensor::Sensor *presence_confidence_sensor_{nullptr};
   sensor::Sensor *motion_energy_sensor_{nullptr};
-  binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
+  sensor::Sensor *presence_sensor_{nullptr};
 };
 
 }  // namespace s3km1110
