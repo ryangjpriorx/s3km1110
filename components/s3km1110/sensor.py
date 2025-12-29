@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, binary_sensor, uart
+from esphome.components import sensor, uart
 from esphome.const import CONF_ID, CONF_UART_ID
 
 from . import s3km1110_ns
@@ -35,7 +35,10 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=0,
         ),
 
-        cv.Optional(CONF_PRESENCE): binary_sensor.binary_sensor_schema(),
+        cv.Optional(CONF_PRESENCE): sensor.sensor_schema(
+            unit_of_measurement="",
+            accuracy_decimals=0,
+        ),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -60,5 +63,5 @@ async def to_code(config):
         cg.add(var.set_motion_energy_sensor(s))
 
     if CONF_PRESENCE in config:
-        bs = await binary_sensor.new_binary_sensor(config[CONF_PRESENCE])
-        cg.add(var.set_presence_binary_sensor(bs))
+        s = await sensor.new_sensor(config[CONF_PRESENCE])
+        cg.add(var.set_presence_sensor(s))
