@@ -2,9 +2,9 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/log.h"
+#include "esphome/uart/uart.h"
 #include "esphome/sensor/sensor.h"
 #include "esphome/binary_sensor/binary_sensor.h"
-#include "esphome/uart/uart.h"
 
 namespace esphome {
 namespace s3km1110 {
