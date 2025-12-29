@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor
-from esphome.const import UNIT_EMPTY, ICON_RADAR
+from esphome.const import UNIT_EMPTY, ICON_RADIO_TOWER
 
 DEPENDENCIES = ["s3km1110"]
 
@@ -11,7 +11,7 @@ S3KM1110Sensor = s3km1110_ns.class_("S3KM1110Sensor", sensor.Sensor, cg.Componen
 CONFIG_SCHEMA = sensor.sensor_schema(
     S3KM1110Sensor,
     unit_of_measurement=UNIT_EMPTY,
-    icon=ICON_WAVEFORM,
+    icon=ICON_EMPTY,
 ).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
