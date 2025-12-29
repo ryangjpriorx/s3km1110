@@ -1,19 +1,73 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor
-from esphome.const import UNIT_EMPTY
+from esphome.components import sensor, binary_sensor, uart
+from esphome.const import (
+    CONF_ID,
+    CONF_UART_ID,
+)
 
-DEPENDENCIES = ["s3km1110"]
+from . import s3km1110_ns
 
-s3km1110_ns = cg.esphome_ns.namespace("s3km1110")
-S3KM1110Sensor = s3km1110_ns.class_("S3KM1110Sensor", sensor.Sensor, cg.Component)
+DEPENDENCIES = ["uart"]
 
-CONFIG_SCHEMA = sensor.sensor_schema(
-    S3KM1110Sensor,
-    unit_of_measurement=UNIT_EMPTY,
+S3KM1110Component = s3km1110_ns.class_("S3KM1110Component", cg.Component)
+
+# Config keys for the sub-sensors
+CONF_MICRO_MOTION = "micro_motion"
+CONF_PRESENCE_CONFIDENCE = "presence_confidence"
+CONF_MOTION_ENERGY = "motion_energy"
+CONF_PRESENCE = "presence"
+
+CONFIG_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(): cv.declare_id(S3KM1110Component),
+
+        # Required UART bus
+        cv.Required(CONF_UART_ID): cv.use_id(uart.UARTComponent),
+
+        # Optional sub-sensors
+        cv.Optional(CONF_MICRO_MOTION): sensor.sensor_schema(
+            unit_of_measurement="",
+            accuracy_decimals=0,
+        ),
+
+        cv.Optional(CONF_PRESENCE_CONFIDENCE): sensor.sensor_schema(
+            unit_of_measurement="%",
+            accuracy_decimals=0,
+        ),
+
+        cv.Optional(CONF_MOTION_ENERGY): sensor.sensor_schema(
+            unit_of_measurement="",
+            accuracy_decimals=0,
+        ),
+
+        cv.Optional(CONF_PRESENCE): binary_sensor.binary_sensor_schema(),
+    }
 ).extend(cv.COMPONENT_SCHEMA)
 
+
 async def to_code(config):
-    var = cg.new_Pvariable(config["id"])
+    # Create the main component
+    var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
-    await sensor.register_sensor(var, config)
+
+    # Attach UART
+    uart_comp = await cg.get_variable(config[CONF_UART_ID])
+    cg.add(var.set_uart(uart_comp))
+
+    # Optional sensors
+    if CONF_MICRO_MOTION in config:
+        s = await sensor.new_sensor(config[CONF_MICRO_MOTION])
+        cg.add(var.set_micro_motion_sensor(s))
+
+    if CONF_PRESENCE_CONFIDENCE in config:
+        s = await sensor.new_sensor(config[CONF_PRESENCE_CONFIDENCE])
+        cg.add(var.set_presence_confidence_sensor(s))
+
+    if CONF_MOTION_ENERGY in config:
+        s = await sensor.new_sensor(config[CONF_MOTION_ENERGY])
+        cg.add(var.set_motion_energy_sensor(s))
+
+    if CONF_PRESENCE in config:
+        bs = await binary_sensor.new_binary_sensor(config[CONF_PRESENCE])
+        cg.add(var.set_presence_binary_sensor(bs))
