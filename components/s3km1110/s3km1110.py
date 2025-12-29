@@ -16,14 +16,8 @@ CONFIG_SCHEMA = cv.Schema(
 
         cv.Required(CONF_UART_ID): cv.use_id(uart.UARTComponent),
 
-        cv.Optional(CONF_MOTION_ENERGY): sensor.sensor_schema(
-            accuracy_decimals=0
-        ),
-
-        cv.Optional(CONF_PRESENCE): sensor.sensor_schema(
-            accuracy_decimals=0
-        ),
-
+        cv.Optional(CONF_MOTION_ENERGY): sensor.sensor_schema(),
+        cv.Optional(CONF_PRESENCE): sensor.sensor_schema(),
         cv.Optional(CONF_PRESENCE_BINARY): binary_sensor.binary_sensor_schema(),
     }
 ).extend(cv.COMPONENT_SCHEMA)
