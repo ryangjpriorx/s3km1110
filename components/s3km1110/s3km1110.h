@@ -17,37 +17,21 @@ class S3KM1110Component : public Component {
   void set_presence_sensor(sensor::Sensor *s) { this->presence_sensor_ = s; }
 
   void setup() override {
-    // Initialize hardware here if needed
+    ESP_LOGI("s3km1110", "S3KM1110 component initialized");
   }
 
   void loop() override {
-    if (this->uart_ == nullptr)
+    if (!this->uart_)
       return;
 
-    // TODO: Replace with real UART parsing for S3KM1110
+    // Read and log all incoming UART bytes
     while (this->uart_->available()) {
       uint8_t byte;
       this->uart_->read_byte(&byte);
-      // Feed into your parser here
+      ESP_LOGD("s3km1110", "UART byte: 0x%02X", byte);
+
+      // TODO: feed into real parser once we know the protocol
     }
-
-    // Dummy values for testing
-    float micro_motion = 1.0f;
-    float presence_confidence = 80.0f;
-    float motion_energy = 5.0f;
-    float presence = 1.0f;  // 1 = present, 0 = not present
-
-    if (this->micro_motion_sensor_ != nullptr)
-      this->micro_motion_sensor_->publish_state(micro_motion);
-
-    if (this->presence_confidence_sensor_ != nullptr)
-      this->presence_confidence_sensor_->publish_state(presence_confidence);
-
-    if (this->motion_energy_sensor_ != nullptr)
-      this->motion_energy_sensor_->publish_state(motion_energy);
-
-    if (this->presence_sensor_ != nullptr)
-      this->presence_sensor_->publish_state(presence);
   }
 
  protected:
