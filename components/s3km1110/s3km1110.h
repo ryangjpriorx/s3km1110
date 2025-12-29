@@ -3,9 +3,12 @@
 #include "esphome/core/component.h"
 #include "esphome/core/log.h"
 
+// UART stayed under components/
 #include "esphome/components/uart/uart.h"
-#include "esphome/components/sensor/sensor.h"
-#include "esphome/components/binary_sensor/binary_sensor.h"
+
+// Sensors moved to top-level in 2024.12.x
+#include "esphome/sensor/sensor.h"
+#include "esphome/binary_sensor/binary_sensor.h"
 
 
 namespace esphome {
