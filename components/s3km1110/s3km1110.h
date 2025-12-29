@@ -3,8 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/binary_sensor/__init__.h"
-
+#include "esphome/components/binary_sensor/binary_sensor.h"
 
 namespace esphome {
 namespace s3km1110 {
@@ -19,46 +18,37 @@ class S3KM1110Component : public Component {
   void set_presence_binary_sensor(binary_sensor::BinarySensor *bs) { this->presence_binary_sensor_ = bs; }
 
   void setup() override {
-    // TODO: Initialize the S3KM1110 here if required
+    // Initialize hardware here if needed
   }
 
   void loop() override {
-    if (this->uart_ == nullptr) {
-      return;
-    }
+    if (this->uart_ == nullptr) return;
 
-    // TODO: Replace this stub with real UART protocol parsing
-    // This is just placeholder logic to show the sensors can update.
-
+    // TODO: Replace with real UART parsing for S3KM1110
     while (this->uart_->available()) {
       uint8_t byte;
       this->uart_->read_byte(&byte);
-      // TODO: feed bytes into a state machine / frame parser
+      // Feed into your parser here
     }
 
-    // Example dummy values (remove once real values are parsed)
-    const float dummy_micro_motion = 1.0f;
-    const float dummy_presence_confidence = 80.0f;
-    const float dummy_motion_energy = 5.0f;
-    const bool dummy_presence = true;
+    // Dummy values for testing
+    float micro_motion = 1.0f;
+    float presence_confidence = 80.0f;
+    float motion_energy = 5.0f;
+    bool presence = true;
 
-    if (this->micro_motion_sensor_ != nullptr) {
-      this->micro_motion_sensor_->publish_state(dummy_micro_motion);
-    }
+    if (this->micro_motion_sensor_ != nullptr)
+      this->micro_motion_sensor_->publish_state(micro_motion);
 
-    if (this->presence_confidence_sensor_ != nullptr) {
-      this->presence_confidence_sensor_->publish_state(dummy_presence_confidence);
-    }
+    if (this->presence_confidence_sensor_ != nullptr)
+      this->presence_confidence_sensor_->publish_state(presence_confidence);
 
-    if (this->motion_energy_sensor_ != nullptr) {
-      this->motion_energy_sensor_->publish_state(dummy_motion_energy);
-    }
+    if (this->motion_energy_sensor_ != nullptr)
+      this->motion_energy_sensor_->publish_state(motion_energy);
 
-    if (this->presence_binary_sensor_ != nullptr) {
-      this->presence_binary_sensor_->publish_state(dummy_presence);
-    }
+    if (this->presence_binary_sensor_ != nullptr)
+      this->presence_binary_sensor_->publish_state(presence);
 
-    // Slow this down a bit so we don’t spam HA
     delay(500);
   }
 
